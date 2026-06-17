@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: devboard-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: devboard
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - devboard-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend
+  backend:
+    build: ./backend
+    container_name: devboard-backend
+    ports:
+      - "5000:5000"
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: root123
+      DB_NAME: devboard
+      PORT: 5000
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - devboard-network
+
+  # Frontend
+  frontend:
+    build: ./frontend
+    container_name: devboard-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - devboard-network
+
+volumes:
+  mysql-data:
+
+networks:
+  devboard-network:
+    driver: bridge
