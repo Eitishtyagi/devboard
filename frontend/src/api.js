@@ -1,5 +1,5 @@
 // Backend ka address ek jagah
-const API_URL = 'http://localhost:5000'
+const API_URL = 'http://13.207.149.51:5000'
 
 // Saare tasks lao
 export const getTasks = async () => {
