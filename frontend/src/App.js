@@ -50,7 +50,7 @@ function App() {
 
       {/* Header */}
       <div className="header">
-        <h1>📋 DevBoard Pro</h1>
+        <h1>📋 DevBoard Pro 1</h1>
         <p>Apne tasks manage karo</p>
       </div>
 
