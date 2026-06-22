@@ -1,4 +1,4 @@
-// Backend ka address ek jagah
+// Production API URL
 const API_URL = 'http://13.207.149.51:5000'
 
 // Saare tasks lao
