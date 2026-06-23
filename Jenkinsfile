@@ -6,7 +6,7 @@ pipeline {
         ECR_REGISTRY = '367709774709.dkr.ecr.ap-south-1.amazonaws.com'
         BACKEND_IMAGE = 'devboard-backend'
         FRONTEND_IMAGE = 'devboard-frontend'
-        APP_EC2_IP = '13.207.149.51'
+        APP_EC2_IP = '43.205.238.78'
     }
 
     stages {

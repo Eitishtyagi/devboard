@@ -1,5 +1,5 @@
 // Production API URL
-const API_URL = 'http://13.207.149.51:5000'
+const API_URL = 'http://43.205.238.78:5000'
 
 // Saare tasks lao
 export const getTasks = async () => {
