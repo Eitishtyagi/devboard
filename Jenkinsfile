@@ -43,15 +43,20 @@ pipeline {
 
         stage('Deploy') {
     steps {
+        echo 'ASG instances pe deploy ho raha hai...'
         sh '''
-            aws autoscaling describe-auto-scaling-groups \
-            --auto-scaling-group-names devboard-asg \
-            --query "AutoScalingGroups[0].Instances[*].InstanceId" \
-            --output text | tr '\t' '\n' | while read instance_id; do
-                aws ssm send-command \
-                --instance-ids "$instance_id" \
-                --document-name "AWS-RunShellScript" \
-                --parameters commands=["cd /home/ubuntu/devboard && aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 367709774709.dkr.ecr.ap-south-1.amazonaws.com && docker compose pull && docker compose up -d"]
+            for instance_ip in $(aws ec2 describe-instances \
+            --filters "Name=tag:aws:autoscaling:groupName,Values=devboard-asg" \
+            "Name=instance-state-name,Values=running" \
+            --query "Reservations[*].Instances[*].PublicIpAddress" \
+            --output text); do
+                ssh -o StrictHostKeyChecking=no ubuntu@$instance_ip "
+                    cd /home/ubuntu/devboard &&
+                    aws ecr get-login-password --region ap-south-1 | \
+                    docker login --username AWS --password-stdin 367709774709.dkr.ecr.ap-south-1.amazonaws.com &&
+                    docker compose pull &&
+                    docker compose up -d
+                "
             done
         '''
     }
