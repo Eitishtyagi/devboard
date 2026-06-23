@@ -2,12 +2,11 @@ pipeline {
     agent any
 
     environment {
-        AWS_REGION = 'ap-south-1'
-        ECR_REGISTRY = '367709774709.dkr.ecr.ap-south-1.amazonaws.com'
-        BACKEND_IMAGE = 'devboard-backend'
-        FRONTEND_IMAGE = 'devboard-frontend'
-        APP_EC2_IP = '43.205.238.78'
-    }
+    AWS_REGION = 'ap-south-1'
+    ECR_REGISTRY = '367709774709.dkr.ecr.ap-south-1.amazonaws.com'
+    BACKEND_IMAGE = 'devboard-backend'
+    FRONTEND_IMAGE = 'devboard-frontend'
+}
 
     stages {
 
@@ -43,19 +42,20 @@ pipeline {
         }
 
         stage('Deploy') {
-            steps {
-                echo 'App EC2 pe deploy ho rahi hai...'
-                sh '''
-                    ssh -o StrictHostKeyChecking=no ubuntu@$APP_EC2_IP "
-                        cd devboard &&
-                        aws ecr get-login-password --region ap-south-1 | \
-                        docker login --username AWS --password-stdin 367709774709.dkr.ecr.ap-south-1.amazonaws.com &&
-                        docker compose pull &&
-                        docker compose up -d
-                    "
-                '''
-            }
-        }
+    steps {
+        sh '''
+            aws autoscaling describe-auto-scaling-groups \
+            --auto-scaling-group-names devboard-asg \
+            --query "AutoScalingGroups[0].Instances[*].InstanceId" \
+            --output text | tr '\t' '\n' | while read instance_id; do
+                aws ssm send-command \
+                --instance-ids "$instance_id" \
+                --document-name "AWS-RunShellScript" \
+                --parameters commands=["cd /home/ubuntu/devboard && aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 367709774709.dkr.ecr.ap-south-1.amazonaws.com && docker compose pull && docker compose up -d"]
+            done
+        '''
+    }
+}
     }
 
     post {

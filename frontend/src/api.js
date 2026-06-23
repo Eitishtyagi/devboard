@@ -1,5 +1,5 @@
 // Production API URL
-const API_URL = 'http://43.205.238.78:5000'
+const API_URL = 'devboard-alb-2024257509.ap-south-1.elb.amazonaws.com'
 
 // Saare tasks lao
 export const getTasks = async () => {
