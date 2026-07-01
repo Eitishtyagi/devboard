@@ -32,7 +32,7 @@ jobs:
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
             --parameters commands='[
-              "cd /home/ssm-user/devboard",
+              "cd /home/ec2-user/devboard",
               "git pull origin main",
               "sudo docker compose up -d --build"
             ]' \
